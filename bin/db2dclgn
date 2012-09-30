@@ -1,0 +1,2 @@
+echo "$DB2_BASE/bin/db2dclgn -l cobol -t ${DB2_SCHEMA}.$1 -d ${DB2_SID} -u ${DB_USER} -p ${DB_PASS} -o $SOURCE/copy/$1.cpy -i "
+$DB2_BASE/bin/db2dclgn -l cobol -t ${DB2_SCHEMA}.SHARES -d ${DB2_SID} -u ${DB_USER} -p ${DB_PASS} -o $SOURCE/copy/$1.cpy -i

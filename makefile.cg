@@ -1,0 +1,11 @@
+#
+all: cobexamples
+#
+clean:
+	cd asc2ebc  ; make -f makefile.cg clean
+	cd brkmng   ; make -f makefile.cg clean
+	cd brkcob   ; make -f makefile.cg clean 
+cobexamples:
+	cd asc2ebc  ; make -f makefile.cg all
+	cd brkmng   ; make -f makefile.cg all
+	cd brkcob   ; make -f makefile.cg all 

@@ -1,0 +1,69 @@
+#!/bin/bash
+#
+export MKDB2VER=9.7
+export DB2INCLUDE=${DB2_HOME}/include:${COBCPY}
+#
+PMGNAME=$1
+PMGLST=`basename $PMGNAME | sed "s/.sqb$/.lst/"`
+PGMBND=`basename $PMGNAME | sed "s/.sqb$/.bnd/"`
+PGMCOB=`basename $PMGNAME | sed "s/.sqb$/.cob/"`
+#
+LISTFILE=${PMGLST}
+DESTFILE=${PGMCOB}
+BINDFILE=${PGMBND}
+#
+export TARGET=IBMCOB
+PREOPT1="sqlwarn NO call_resolution DEFERRED collection ${DB2_COLLECTION} qualifier ${DB2_SCHEMA} "
+PREOPT2="messages ${LISTFILE} version AUTO "
+PREOPTS=$PREOPT1$PREOPT2
+#
+# Connect to a database.
+#
+#echo "db2 connect to ${DB2_SID} user ${DB_USER} using ${DB_PASS}"
+#db2 connect to ${DB2_SID} user ${DB_USER} using ${DB_PASS}
+#
+# Precompile Source
+#
+echo " PMGNAME is : " $PMGNAME
+echo " connect to ${DB2_SID} user ${DB_USER} using ${DB_PASS} "
+#echo " prep $PMGNAME bindfile using $BINDFILE target $TARGET output $DESTFILE $PREOPTS "
+echo " prep $PMGNAME bindfile output $PGMCOB target $TARGET messages ${PMGLST} "
+#connect to $DB2_SID user $DB_USER using $DB_PASS ;
+#connect to UDISPASS user w_cesaf1 using oe33udf ;
+#
+db2 -t -x +p <<-eof 
+connect to $DB2_SID user $DB_USER using $DB_PASS ;
+prep $PMGNAME bindfile output $PGMCOB target $TARGET messages ${PMGLST} ;
+terminate ;
+eof
+#
+grep "SQL0095N" ${LISTFILE}  >/dev/null
+RC=$?
+if [ $RC -eq 0 ]; then
+    db2 connect reset
+    echo "Error PREPARE : " $0 - $1
+    exit -1
+fi
+#
+# Bind the program to the database.
+#
+echo "db2 bind $BINDFILE action REPLACE  messages $LISTFILE.bnd "
+db2 -t -x +p <<-eof
+connect to $DB2_SID user $DB_USER using $DB_PASS ;
+bind $BINDFILE action REPLACE  messages $LISTFILE.bnd;
+terminate ;
+eof
+
+#db2 bind $BINDFILE action REPLACE  messages $LISTFILE.bnd
+RC=$?
+if [ $RC -ne 0 ]; then
+    db2 connect reset
+    echo "Error BIND : " $0 - $1
+    exit $RC
+fi
+#
+# Disconnect from the database.
+db2 connect reset
+set -e
+#
+exit 0
