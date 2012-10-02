@@ -1,1 +1,0 @@
-/opt/ibm/db2/V9.7/bin/clpplus -nw ${DB_USER}/${DB_PASS}@localhost:50000/${DB2_SID}

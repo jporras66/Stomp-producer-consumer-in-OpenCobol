@@ -1,5 +1,0 @@
-db2 "connect to ${DB2_SID} user ${DB_USER} using ${DB_PASS}"
-db2 set schema=${DB2_SCHEMA}
-db2 set SQLCOMPAT PLSQL;
-db2 +c 
-db2 connect reset
